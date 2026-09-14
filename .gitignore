@@ -1,3 +1,5 @@
 **/build/*
 My_Project/
 .clangd
+prog.sh
+

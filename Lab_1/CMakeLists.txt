@@ -13,4 +13,7 @@ add_executable(Lab1_app
     main.c
 )
 
-target_include_directories(Lab1_app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(Lab1_app 
+    PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
