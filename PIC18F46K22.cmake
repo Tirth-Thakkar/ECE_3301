@@ -1,0 +1,23 @@
+set(CMAKE_SYSTEM_NAME "Generic")
+set(CMAKE_SYSTEM_PROCESSOR PIC)
+
+find_program(XC8_COMPILER xc8-cc)
+
+if(NOT XC8_COMPILER)
+    message(FATAL_ERROR "XC8 compiler not found.")
+endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_COMPILER ${XC8_COMPILER})
+set(CMAKE_ASM_COMPILER ${XC8_COMPILER})
+set(CMAKE_C_COMPILER_ID XC8)
+set(CMAKE_C_COMPILER_ID_RUN TRUE)
+set(CMAKE_C_COMPILER_FORCED TRUE)
+set(CMAKE_USER_MAKE_RULES_OVERRIDE_C "${CMAKE_CURRENT_LIST_DIR}/XC8Rules.cmake")
+
+set(MCU "18F46K22")
+set(DFP_PATH "$ENV{HOME}/.mchp_packs/Microchip/PIC18F-K_DFP/1.17.312/xc8"
+    CACHE PATH "Path to the XC8 directory in the PIC18F-K device family pack")
+
+set(CMAKE_C_FLAGS_INIT "-mcpu=${MCU} -mdfp=${DFP_PATH}")
+set(CMAKE_ASM_FLAGS_INIT "-mcpu=${MCU} -mdfp=${DFP_PATH}")
