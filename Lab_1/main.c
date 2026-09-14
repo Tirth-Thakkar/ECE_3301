@@ -1,5 +1,3 @@
-
-
 #include <xc.h>
 #include "Configuration.h"
 #define _XTAL_FREQ 64000000  // Set the system clock frequency (32 MHz for DM164136 with PIC18F48Q10)
