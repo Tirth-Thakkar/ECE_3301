@@ -9,11 +9,11 @@ add_compile_options(${MCU_FLAGS})
 add_link_options(${MCU_FLAGS})
 
 # Define the build target
-add_executable(Lab1_app 
+add_executable(Lab2_app 
     src/main.c
 )
 
-target_include_directories(Lab1_app 
+target_include_directories(Lab2_app 
     PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
