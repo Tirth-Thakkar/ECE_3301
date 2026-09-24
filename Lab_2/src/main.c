@@ -13,6 +13,7 @@ void init(void) {
     
     // Configure Inputs  
     TRISBbits.TRISB4 = 0x01; // HPC Button
+    ANSELBbits.ANSB4 = 0x00; // Disable Analog
     
     // Configure Ports C and D as outputs
     TRISC = 0x00;
