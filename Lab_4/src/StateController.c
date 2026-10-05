@@ -22,5 +22,4 @@ void fsm_init(void) {
 void fsm_sys_tick_increment(uint8_t tick) {
     fsm_t.sys_tick += tick;
     // Divide the 10ms sys_tick to operate rate groups
-    
 }
