@@ -9,13 +9,6 @@ typedef enum {
     STATE_FAULT
 } State;
 
-typedef enum {
-    SM_RESET, // Trigger Safe
-    SM_ARMING, // Arming Sequence Started
-    SM_ARMED, // Arming Seq Complete
-    SM_FAULT, // Fault Triggered
-} Signal;
-
 typedef struct {
     uint8_t ms_200; 
     uint8_t ms_500; 
