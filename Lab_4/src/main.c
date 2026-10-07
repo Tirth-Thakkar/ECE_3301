@@ -16,6 +16,7 @@ void main(void) {
     fsm_init();
     while(1){
         gen_sys_tick();
+        monitor_safety();
         fsm_run(sys_tick);
     }
 }

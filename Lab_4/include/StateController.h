@@ -22,4 +22,7 @@ void fsm_init(void);
 void fsm_run(uint8_t tick);
 void fsm_sys_tick_increment(uint8_t tick);
 
+// Handles Immediate Arm Disabling + Fault Triggering
+void monitor_safety(void); 
+
 #endif // STATECONTROLLER_H

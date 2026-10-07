@@ -31,8 +31,7 @@ void gen_heartbeat(uint8_t*);
 void handle_arm_request(void);
 void handle_arming_seq(void);
 void handle_armed(void);
-void check_fault(void);
-
+void handle_fault(void);
 
 void fsm_run(uint8_t tick) {
         fsm_sys_tick_increment(tick);
@@ -40,10 +39,10 @@ void fsm_run(uint8_t tick) {
         switch(fsm_t.current_state) {
             case STATE_SAFE:
                 fsm_t.rate_group.ms_500 = 0;
-                handle_arm_request();
                 // Set Outputs
                 ARMED_LED = 0;
                 FAULT_LED = 0;
+                handle_arm_request();
                 break;
             case STATE_ARMING:
                 // Clear Rate Group Flag
@@ -52,11 +51,15 @@ void fsm_run(uint8_t tick) {
                 break;
             case STATE_ARMED:
                 fsm_t.rate_group.ms_1000 = 0;
-                handle_armed();
                 ARMED_LED = 1;
                 FAULT_LED = 0;
+                handle_armed();
                 break;
             case STATE_FAULT:
+                ARMED_LED = 0;
+                FAULT_LED = 1;
+                COMM_HEARTBEAT_LED = 0;
+                handle_fault();
                 break;
             default:
                 break;
@@ -120,6 +123,8 @@ void handle_arming_seq(void) {
     } else {
         fsm_t.current_state = STATE_SAFE;
     }
+
+    fsm_t.rate_group.ms_2000 = 0;
 }
 
 void handle_armed(void) {
@@ -137,9 +142,31 @@ void handle_armed(void) {
     }
 }
 
+void handle_fault(void) {
+    int fault_status = button_engaged(FAULT);
+    int arm_status = button_engaged(ARM_REQUEST);
 
-// TODO
+    if (!fault_status && !arm_status) {
+        fsm_t.current_state = STATE_SAFE;
+    }
+}
+
+void monitor_safety(void) {
+    int fault_status = button_engaged(FAULT);
+    
+    if (fault_status) {
+        fsm_t.current_state = STATE_FAULT;
+    }
+
+    return;
+}
+
 void gen_heartbeat(uint8_t *rate) {
+    if(*rate) {
+        COMM_HEARTBEAT_LED = !COMM_HEARTBEAT_LED;
+        *rate = 0;
+    }
+    
     return;
 }
 
