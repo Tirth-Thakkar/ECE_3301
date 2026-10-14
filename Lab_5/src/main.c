@@ -44,17 +44,27 @@ void configure_sys(void) {
     TRISD = 0x00; // Configure D as output
 
     // System Timer Config
-    OSCCONbits.IRCF = 0b111; // 16 MHz Internal Oscillator
-    OSCCONbits.SCS = 0b10; // System Clock Source
-    OSCTUNEbits.PLLEN = 0; // Internal clock at 16 MHz
+    // 16 MHz Internal Oscillator
+    OSCCONbits.IRCF = 0b111; 
+    OSCCONbits.SCS = 0b10;
+    OSCTUNEbits.PLLEN = 0;
 
-    T0CONbits.TMR0ON = 0; // Configure Timer0 
-    T0CONbits.T08BIT = 0; // 16 bit mode
-    T0CONbits.T0CS = 0; // Internal instruction cycle clock
-    T0CONbits.PSA = 0; // Enable Prescaler
-    T0CONbits.T0PS = 0b010; // 1:8 Prescaler
-    TMR0H = TMR0_PRELOAD_H;
-    TMR0L = TMR0_PRELOAD_L;
-    INTCONbits.TMR0IF = 0;
-    T0CONbits.TMR0ON = 1;
+    // Post & Pre-Scaler Config
+    // T2OUTPS<3:0> = 0000, 1:1 Postscaler
+    T2OUTPS0 = 0b0;
+    T2OUTPS1 = 0b0;
+    T2OUTPS2 = 0b0;
+    T2OUTPS3 = 0b0;
+    
+    // T2CKPS <1:0> = 1X 16:1 Prescaler 
+    T2CKPS0 = 0b1;
+    T2CKPS1 = 0b1;   
+
+    // Enable Timer2
+    T2CONbits.TMR2ON = 1;
+    PR2 = 249;
+
+    // Inturrupt Config
+    
+
 }
