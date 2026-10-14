@@ -5,7 +5,7 @@
 
 #define _XTAL_FREQ 16000000
 
-#define FAULT_INTR_EN  INTCONbits.INT0IE 
+#define FAULT_INTR_EN  INTCONbits.INT0IE
 #define FAULT_INTR_FLAG INTCONbits.INT0IF
 
 #define ARM_INTR_EN    INTCON3bits.INT1IE
@@ -30,6 +30,7 @@ void main(void) {
     start_timer();
     while(1){
         gen_sys_tick();
+        process_requests(sys_tick);
         monitor_safety();
         fsm_run(sys_tick);
     }
@@ -45,7 +46,7 @@ void __interrupt(low_priority) low_isr(void) {
         ARM_INTR_FLAG = 0;
         arm_req = 0b1;
     }
-    
+
     if (COMM_INTR_EN && COMM_INTR_FLAG) {
         COMM_INTR_FLAG = 0;
         comm_req = 0b1;
