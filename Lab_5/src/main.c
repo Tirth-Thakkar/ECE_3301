@@ -2,7 +2,22 @@
 #include <stdint.h>
 #include "../include/Configuration.h"
 #include "../include/StateController.h"
-volatile uint32_t system_ms = 0;
+
+#define _XTAL_FREQ 16000000
+
+#define FAULT_INTR_EN  INTCONbits.INT0IE 
+#define FAULT_INTR_FLAG INTCONbits.INT0IF
+
+#define ARM_INTR_EN    INTCON3bits.INT1IE
+#define ARM_INTR_FLAG  INTCON3bits.INT1IF
+
+#define COMM_INTR_EN   INTCON3bits.INT2IE
+#define COMM_INTR_FLAG INTCON3bits.INT2IF 
+
+#define TIMER_INTR_EN  PIE1bits.TMR2IE
+#define TIMER_INTR_FLAG PIR1bits.TMR2IF
+
+volatile uint32_t system_ms = 0b0;
 uint32_t sys_tick = 0;
 
 void gen_sys_tick(void); 
@@ -21,9 +36,26 @@ void main(void) {
 }
 
 void __interrupt(low_priority) low_isr(void) {
-    if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
-        PIR1bits.TMR2IF = 0;
+    if (TIMER_INTR_EN && TIMER_INTR_FLAG) {
+        TIMER_INTR_FLAG = 0;
         system_ms++;
+    }
+    
+    if (ARM_INTR_EN && ARM_INTR_FLAG) {
+        ARM_INTR_FLAG = 0;
+        arm_req = 0b1;
+    }
+    
+    if (COMM_INTR_EN && COMM_INTR_FLAG) {
+        COMM_INTR_FLAG = 0;
+        comm_req = 0b1;
+    }
+}
+
+void __interrupt(high_priority) high_isr(void) {
+    if (FAULT_INTR_EN && FAULT_INTR_FLAG) {
+        FAULT_INTR_FLAG = 0;
+        fault_status = 0b1;
     }
 }
 
@@ -62,6 +94,8 @@ void configure_sys(void) {
     TMR2 = 0;
     PR2 = 249;
 
+    // Note: Intr 0: Fault, Intr 1: Arm Req, Intr 2: Heartbeat 
+    
     // Falling Edge Button Config (Active Low)
     INTCON2bits.INTEDG0 = 0;
     INTCON2bits.INTEDG1 = 0;
@@ -74,15 +108,15 @@ void configure_sys(void) {
     IPR1bits.TMR2IP = 0;
 
     // Clear Pending Flags & Enable Interrupts
-    INTCONbits.INT0IF = 0;
-    INTCON3bits.INT1IF = 0;
-    INTCON3bits.INT2IF = 0;
-    PIR1bits.TMR2IF = 0;
+    FAULT_INTR_FLAG = 0;
+    ARM_INTR_FLAG = 0;
+    COMM_INTR_FLAG = 0;
+    TIMER_INTR_FLAG = 0;
 
-    INTCONbits.INT0IE = 1;
-    INTCON3bits.INT1IE = 1;
-    INTCON3bits.INT2IE = 1;
-    PIE1bits.TMR2IE = 1;
+    FAULT_INTR_EN = 1;
+    ARM_INTR_EN = 1;
+    COMM_INTR_EN = 1;
+    TIMER_INTR_EN = 1;
 
 }
 

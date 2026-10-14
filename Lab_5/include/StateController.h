@@ -18,6 +18,21 @@ typedef struct {
 } RateGroup;
 
 
+struct StateController {
+    State current_state;
+    RateGroup rate_group;
+    uint32_t sys_tick;
+};
+
+static struct StateController fsm_t;
+static RateGroup rate_group_t = {0, 0, 0, 0, 0}; 
+static uint8_t comm_previous = 0b0;
+static uint8_t comm_event = 0b0;
+
+volatile uint32_t comm_req = 0b0; 
+volatile uint32_t arm_req = 0b0;
+volatile uint32_t fault_status = 0b0;
+
 void fsm_init(void);
 void fsm_run(uint32_t tick);
 
