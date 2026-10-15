@@ -3,8 +3,7 @@
 - PIC Configuration is in include/Configuration.h
 
 ## Demo Video
-- [YouTube Video]() containing the demo of the lab.
-- https://youtu.be/QdZCE2mGD_g?is=QohSsj1b9SZGz_ai
+- [YouTube Video](https://youtu.be/QdZCE2mGD_g?is=QohSsj1b9SZGz_ai) containing the demo of the lab.
 
 ## Build Instructions
 - In the Lab 5 Dir run the following 
