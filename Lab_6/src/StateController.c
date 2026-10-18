@@ -8,6 +8,8 @@ static Timestamp timestamp_t = {"$TIME, ", 0};
 
 void fsm_run(uint32_t tick) {
     fsm_t.sys_tick = tick;
+    // handle_rx_fault();
+    // rx --> rx_handle --> transition     
 }
 
 void fsm_init(void) {
