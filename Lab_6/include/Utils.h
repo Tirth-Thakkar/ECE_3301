@@ -2,16 +2,34 @@
 #define UTILS_H
 
 #include <xc.h>
-#include "../include/Configuration.h"  
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "../include/Configuration.h"  
+#include "../include/StateController.h"
+
 #define _XTAL_FREQ 64000000  
 #define ARMED_LED LATAbits.LATA7
+#define TIMER_INTR_EN  PIE1bits.TMR2IE
+#define TIMER_INTR_FLAG PIR1bits.TMR2IF
 
 void init_sys(void) {
-    // Configure Oscillator 64MHz
-    OSCCON = 0b01110000;
-    OSCTUNE= 0b01000000;
+    // System Timer Config
+    // 16 MHz Internal Oscillator
+    OSCCONbits.IRCF = 0b111; 
+    OSCCONbits.SCS = 0b10;
+    OSCTUNEbits.PLLEN = 0;
+    
+    // Post & Pre-Scaler Config
+    T2CONbits.TMR2ON = 0;
+    T2CONbits.T2OUTPS = 0b0000; // 1:1 postscaler
+    T2CONbits.T2CKPS = 0b10;    // 1:16 prescaler
+    TMR2 = 0;
+    PR2 = 249;
+    
+    // Timer 2 Interrupt Config
+    IPR1bits.TMR2IP = 0;
     
     // Set RA7 as output (1 = input, 0 = output)
     TRISAbits.TRISA7 = 0;
@@ -24,18 +42,30 @@ void init_sys(void) {
     TRISCbits.TRISC6 = 1; // Set RC6 as input
     TRISCbits.TRISC7 = 1; // Set RC7 as input
     TXSTA1bits.SYNC = 0; // Set asynchronous mode
+    TXSTA1bits.TX9 = 0; // Set 8-bit transmission
     TXSTA1bits.BRGH = 1; // Set high baud rate
     TXSTA1bits.TXEN = 1; // Enable transmission
+    
     RCSTA1bits.SPEN = 1; // Enable serial port
     RCSTA1bits.CREN = 1; // Enable continuous reception
+    RCSTA1bits.RX9 = 0; // Set 8-bit reception
 
     BAUDCON1bits.BRG16 = 0;
     SPBRG1 = 103;
+
+    TIMER_INTR_FLAG = 0;
+    TIMER_INTR_EN = 1;
     
     return; 
 }
 
-void transmit_char(char c) {
+void start_timer(void) {
+    // Start Timer
+    T2CONbits.TMR2ON = 1;
+    INTCONbits.GIEL = 1;
+}
+
+void UART_SEND(char c) {
    // Check TSR Reg Status 
     while (!PIR1bits.TX1IF); 
     TXREG1 = c; // Load the character into the transmit register
@@ -43,12 +73,37 @@ void transmit_char(char c) {
 
 void trasnmit_string(char *str) {
     while (*str != '\0') {
-        transmit_char(*str++);
+        UART_SEND(*str++);
     }
 }
 
-void transmit_int(uint8_t num) {
-    return;
+
+void transmit_timestap(Timestamp *timestamp) {
+    char hundreds = (timestamp->time / 100) + '0';
+    char tens = ((timestamp->time / 10) % 10) + '0';
+    char ones = (timestamp->time % 10) + '0';
+    
+    char buffer[] = {hundreds, tens, ones, '\0'};
+
+    int buff_size = sizeof(timestamp->code) + sizeof(buffer) + 1;
+    
+    char string_buffer[buff_size];
+    
+    strcpy(string_buffer, timestamp->code);
+    strcat(string_buffer, buffer);
+
+    trasnmit_string(string_buffer);
+}
+
+void trasnmit_response(Response *response) {
+    int buff_size = sizeof(response->code) + sizeof(response->message) + 1;
+
+    char string_buffer[buff_size];
+
+    strcpy(string_buffer, response->code);
+    strcat(string_buffer, response->message);
+
+    trasnmit_string(string_buffer);
 }
 
 #endif // UTILS_H
