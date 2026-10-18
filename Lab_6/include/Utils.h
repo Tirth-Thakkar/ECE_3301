@@ -4,7 +4,6 @@
 #include <xc.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "../include/Configuration.h"  
 #include "../include/StateController.h"
@@ -71,39 +70,27 @@ void UART_SEND(char c) {
     TXREG1 = c; // Load the character into the transmit register
 }
 
-void trasnmit_string(char *str) {
+void transmit_string(char *str) {
     while (*str != '\0') {
         UART_SEND(*str++);
     }
 }
 
 
-void transmit_timestap(Timestamp *timestamp) {
-    char hundreds = (timestamp->time / 100) + '0';
-    char tens = ((timestamp->time / 10) % 10) + '0';
-    char ones = (timestamp->time % 10) + '0';
+void transmit_timestap(const Timestamp *timestamp) {
+    char hundreds = (timestamp->time / 100u) + '0';
+    char tens = ((timestamp->time / 10u) % 10u) + '0';
+    char ones = (timestamp->time % 10u) + '0';
     
-    char buffer[] = {hundreds, tens, ones, '\0'};
+    char int_buffer[] = {hundreds, tens, ones, '\0'};
 
-    int buff_size = sizeof(timestamp->code) + sizeof(buffer) + 1;
-    
-    char string_buffer[buff_size];
-    
-    strcpy(string_buffer, timestamp->code);
-    strcat(string_buffer, buffer);
-
-    trasnmit_string(string_buffer);
+    transmit_string(timestamp->code);
+    transmit_string(int_buffer);
 }
 
-void trasnmit_response(Response *response) {
-    int buff_size = sizeof(response->code) + sizeof(response->message) + 1;
-
-    char string_buffer[buff_size];
-
-    strcpy(string_buffer, response->code);
-    strcat(string_buffer, response->message);
-
-    trasnmit_string(string_buffer);
+void transmit_response(const Response *response) {
+    transmit_string(response->code);
+    transmit_string(response->message);
 }
 
 #endif // UTILS_H
