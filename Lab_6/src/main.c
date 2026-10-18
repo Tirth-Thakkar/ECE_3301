@@ -1,4 +1,6 @@
+#include <xc.h>
 #include "../include/Utils.h"
+#include "../include/Configuration.h"
 
 volatile uint32_t system_ms = 0b0;
 uint32_t sys_tick = 0;

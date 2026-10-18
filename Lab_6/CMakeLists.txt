@@ -8,6 +8,10 @@ set(MCU_FLAGS "-mcpu=${MCU}")
 add_compile_options(${MCU_FLAGS})
 add_link_options(${MCU_FLAGS})
 
+add_library(Utils OBJECT
+    src/Utils.c
+)
+
 add_library(StateController OBJECT
     src/StateController.c
 )
@@ -24,5 +28,6 @@ target_include_directories(Lab6_app
 
 target_sources(Lab6_app
     PRIVATE
+    $<TARGET_OBJECTS:Utils>
     $<TARGET_OBJECTS:StateController>
 )
