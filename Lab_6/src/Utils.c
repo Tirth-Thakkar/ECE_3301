@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <string.h>
 #include "../include/Utils.h"
 
 void init_sys(void) {
@@ -58,14 +59,19 @@ void UART_SEND(char c) {
     TXREG1 = c; // Load the character into the transmit register
 }
 
+void UART_RECEIVE(char *c) {
+    // Check RSR Reg Status
+    while (!PIR1bits.RC1IF); 
+    *c = RCREG1; 
+}
+
 void transmit_string(char *str) {
     while (*str != '\0') {
         UART_SEND(*str++);
     }
 }
 
-
-void transmit_timestap(const Timestamp *timestamp) {
+void transmit_timestamp(const Timestamp *timestamp) {
     char hundreds = (timestamp->time / 100u) + '0';
     char tens = ((timestamp->time / 10u) % 10u) + '0';
     char ones = (timestamp->time % 10u) + '0';
@@ -74,9 +80,54 @@ void transmit_timestap(const Timestamp *timestamp) {
 
     transmit_string(timestamp->code);
     transmit_string(int_buffer);
+    
+    UART_SEND('\r'); 
+    UART_SEND('\n');
 }
 
 void transmit_response(const Response *response) {
     transmit_string(response->code);
     transmit_string(response->message);
+
+    UART_SEND('\r'); 
+    UART_SEND('\n');
 }
+
+void response_callback(Response *err_response, char *input_buffer) {
+    UART_RECEIVE(input_buffer);
+    char valid_input_u[3] = "SAD";
+    char valid_input_l[3] = "sad";
+    
+    if (RCSTA1bits.FERR || RCSTA1bits.OERR) {
+        transmit_string("UART ERROR: ");
+        
+        if (RCSTA1bits.FERR) {
+            err_response->code = "$ERR, ";
+            err_response->message = "Framing Error\r\n";
+            transmit_response(err_response);
+        }
+        
+        if (RCSTA1bits.OERR) {
+            err_response->code = "$ERR, ";
+            err_response->message = "Overrun Error\r\n"; 
+            RCSTA1bits.CREN = 0; // Clear the overrun error
+            RCSTA1bits.CREN = 1; // Re-enable continuous reception
+        }
+    }
+
+    if (strchr(valid_input_u, input_buffer[0]) || strchr(valid_input_l, input_buffer[0])) {
+        err_response->code = "$ACK, ";
+        
+    } else {
+        err_response->code = "$ERR, ";
+        
+        char response[20];        
+        strcat(response, "Invalid Input: ");
+        strncat(response, input_buffer, 1);
+        strcat(response, "\r\n");
+        
+        err_response->message = response;
+        transmit_response(err_response);
+    }
+    
+} 

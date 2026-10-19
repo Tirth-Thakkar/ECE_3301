@@ -12,12 +12,16 @@ void init_sys(void);
 
 void start_timer(void);
 
-void UART_SEND(char c); 
+void UART_SEND(char c);
+
+void UART_RECEIVE(char *c);
 
 void transmit_string(char *str); 
 
-void transmit_timestap(const Timestamp *timestamp);
+void transmit_timestamp(const Timestamp *timestamp);
 
 void transmit_response(const Response *response);
+
+void response_callback(Response *response, char *input_buffer);
 
 #endif // UTILS_H

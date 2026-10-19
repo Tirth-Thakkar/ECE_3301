@@ -7,12 +7,17 @@ typedef enum State{
     STATE_ARMED, 
 } State;
 
+typedef struct Interval {
+    uint32_t time;
+    uint32_t threshold;
+} Interval;
+
 typedef struct RateGroup {
-    uint32_t ms_200;
-    uint32_t ms_500;
-    uint32_t ms_1000;
-    uint32_t ms_2000;
-    uint32_t ms_3000;
+    Interval ms_200;
+    Interval ms_500;
+    Interval ms_1000;
+    Interval ms_2000;
+    Interval ms_3000;
 } RateGroup;
 
 typedef struct Response {
