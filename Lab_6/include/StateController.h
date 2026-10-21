@@ -27,7 +27,7 @@ typedef struct Response {
 
 typedef struct Timestamp {
     char* code;
-    uint8_t time;
+    uint32_t time;
 } Timestamp;
 
 typedef struct StateController{

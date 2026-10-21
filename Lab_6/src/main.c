@@ -17,7 +17,7 @@ void main(void) {
     }
 }
 
-void __interrupt(low_priority) low_isr(void) {
+void __interrupt() isr(void) {
     if (TIMER_INTR_EN && TIMER_INTR_FLAG) {
         TIMER_INTR_FLAG = 0;
         system_ms++;
@@ -25,8 +25,8 @@ void __interrupt(low_priority) low_isr(void) {
 }
 
 void gen_sys_tick(void) {
-    uint8_t low_interrupts_enabled = INTCONbits.GIEL;
-    INTCONbits.GIEL = 0;
+    uint8_t interrupts_enabled = INTCONbits.GIE;
+    INTCONbits.GIE = 0;
     sys_tick = system_ms;
-    INTCONbits.GIEL = low_interrupts_enabled;
+    INTCONbits.GIE = interrupts_enabled;
 }

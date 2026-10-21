@@ -1,3 +1,4 @@
+#include <xc.h>
 #include <string.h>
 #include "../include/Utils.h"
 
@@ -17,36 +18,53 @@ static Timestamp timestamp_t = {"$TIME, ", 0};
 
 void fsm_run(uint32_t tick) {
     fsm_t.sys_tick = tick;
-    char* input_buffer;
+    char input_buffer[2] = {0};
 
-    response_callback(&fsm_t.ack_response, input_buffer);
+    fsm_t.state_response.code = "$STATE, ";
+    fsm_t.state_response.message = (fsm_t.current_state == STATE_SAFE) ? "SAFE" : "ARMED";
+    fsm_t.timestamp.time = fsm_t.sys_tick / 1000u;
 
-    if (strcmp(fsm_t.ack_response.code, "$ERR, ") == 1){
+    if ((uint32_t)(fsm_t.sys_tick - fsm_t.rate_group.ms_1000.time) >= fsm_t.rate_group.ms_1000.threshold) {
+        fsm_t.rate_group.ms_1000.time = fsm_t.sys_tick;
+        transmit_response(&fsm_t.state_response);
+        transmit_timestamp(&fsm_t.timestamp);
+    }
+
+    if (!response_callback(&fsm_t.ack_response, input_buffer)) {
         return;
     }
-    
-    fsm_t.state_response.message = (fsm_t.current_state == STATE_SAFE) ? "SAFE\r\n" : "ARMED\r\n";
+
+    if (strcmp(fsm_t.ack_response.code, "$ERR, ") == 0) {
+        return;
+    }
 
     switch(input_buffer[0]) {
         case 'S':
         case 's':
+            fsm_t.state_response.code = "$STATUS, ";
+            fsm_t.ack_response.message = "STATUS";
             transmit_response(&fsm_t.state_response);
+            transmit_response(&fsm_t.ack_response);
             break;
         case 'A':
         case 'a':
             fsm_t.current_state = STATE_ARMED;
-            fsm_t.state_response.message = "ARMED\r\n";
+            ARMED_LED = 1;
+            fsm_t.state_response.message = "ARMED";
+            fsm_t.ack_response.message = "ARM";
+            transmit_response(&fsm_t.ack_response);
             transmit_response(&fsm_t.state_response);
             break;
         case 'D':
         case 'd':
             fsm_t.current_state = STATE_SAFE;
-            fsm_t.state_response.message = "SAFE\r\n";
+            ARMED_LED = 0;
+            fsm_t.state_response.message = "SAFE";
+            fsm_t.ack_response.message = "DISARM";
+            transmit_response(&fsm_t.ack_response);
             transmit_response(&fsm_t.state_response);
             break;
         }
-
-    transmit_response(&fsm_t.ack_response);
 
 }
 
@@ -57,6 +75,7 @@ void fsm_init(void) {
     fsm_t.state_response = state_response_t;
     fsm_t.timestamp = timestamp_t;
     fsm_t.sys_tick = 0b0;
+    ARMED_LED = 0;
     
     transmit_string("DRONE GROUND LINK ONLINE\r\n");
 }

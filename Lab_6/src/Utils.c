@@ -3,6 +3,10 @@
 #include "../include/Utils.h"
 
 void init_sys(void) {
+    // Disable Interrupts
+    INTCONbits.GIE = 0;
+    INTCONbits.PEIE = 0;
+
     // System Timer Config
     // 16 MHz Internal Oscillator
     OSCCONbits.IRCF = 0b111; 
@@ -16,17 +20,14 @@ void init_sys(void) {
     TMR2 = 0;
     PR2 = 249;
     
-    // Timer 2 Interrupt Config
-    IPR1bits.TMR2IP = 0;
-    
     // Set RA7 as output (1 = input, 0 = output)
-    TRISAbits.TRISA7 = 0;
     ARMED_LED = 0; 
+    TRISAbits.TRISA7 = 0;
 
     // Baud Rate = FOSC / [16 × (SPBRG + 1)]
     // SPBRG = (16,000,000 / (16 × 9600)) - 1 = 103
-    TXSTA1bits.BRGH = 1;
-    
+    ANSELCbits.ANSC6 = 0; // Enable digital I/O on RC6
+    ANSELCbits.ANSC7 = 0; // Enable digital I/O on RC7
     TRISCbits.TRISC6 = 1; // Set RC6 as input
     TRISCbits.TRISC7 = 1; // Set RC7 as input
     TXSTA1bits.SYNC = 0; // Set asynchronous mode
@@ -50,19 +51,24 @@ void init_sys(void) {
 void start_timer(void) {
     // Start Timer
     T2CONbits.TMR2ON = 1;
-    INTCONbits.GIEL = 1;
+    INTCONbits.PEIE = 1;
+    INTCONbits.GIE = 1;
 }
 
 void UART_SEND(char c) {
-   // Check TSR Reg Status 
+    // Check Transmit Buffer Status
     while (!PIR1bits.TX1IF); 
     TXREG1 = c; // Load the character into the transmit register
 }
 
-void UART_RECEIVE(char *c) {
-    // Check RSR Reg Status
-    while (!PIR1bits.RC1IF); 
-    *c = RCREG1; 
+uint8_t UART_RECEIVE(char *c) {
+    // Check Receive Buffer Status
+    if (!PIR1bits.RC1IF) {
+        return 0;
+    }
+
+    *c = RCREG1;
+    return 1;
 }
 
 void transmit_string(char *str) {
@@ -72,14 +78,17 @@ void transmit_string(char *str) {
 }
 
 void transmit_timestamp(const Timestamp *timestamp) {
-    char hundreds = (timestamp->time / 100u) + '0';
-    char tens = ((timestamp->time / 10u) % 10u) + '0';
-    char ones = (timestamp->time % 10u) + '0';
-    
-    char int_buffer[] = {hundreds, tens, ones, '\0'};
+    char int_buffer[11] = {0};
+    uint32_t time = timestamp->time;
+    uint8_t index = sizeof(int_buffer) - 1;
+
+    do {
+        int_buffer[--index] = (char)(time % 10u) + '0';
+        time /= 10u;
+    } while (time != 0);
 
     transmit_string(timestamp->code);
-    transmit_string(int_buffer);
+    transmit_string(&int_buffer[index]);
     
     UART_SEND('\r'); 
     UART_SEND('\n');
@@ -93,41 +102,49 @@ void transmit_response(const Response *response) {
     UART_SEND('\n');
 }
 
-void response_callback(Response *err_response, char *input_buffer) {
-    UART_RECEIVE(input_buffer);
-    char valid_input_u[3] = "SAD";
-    char valid_input_l[3] = "sad";
-    
-    if (RCSTA1bits.FERR || RCSTA1bits.OERR) {
-        transmit_string("UART ERROR: ");
-        
-        if (RCSTA1bits.FERR) {
-            err_response->code = "$ERR, ";
-            err_response->message = "Framing Error\r\n";
-            transmit_response(err_response);
-        }
-        
-        if (RCSTA1bits.OERR) {
-            err_response->code = "$ERR, ";
-            err_response->message = "Overrun Error\r\n"; 
-            RCSTA1bits.CREN = 0; // Clear the overrun error
-            RCSTA1bits.CREN = 1; // Re-enable continuous reception
-        }
+uint8_t response_callback(Response *err_response, char *input_buffer) {
+    char valid_input_u[] = "SAD";
+    char valid_input_l[] = "sad";
+
+    if (RCSTA1bits.OERR) {
+        RCSTA1bits.CREN = 0; // Clear the overrun error
+        RCSTA1bits.CREN = 1; // Re-enable continuous reception
+        err_response->code = "$ERR, ";
+        err_response->message = "Overrun Error";
+        transmit_response(err_response);
+        return 1;
     }
 
-    if (strchr(valid_input_u, input_buffer[0]) || strchr(valid_input_l, input_buffer[0])) {
+    if (!PIR1bits.RC1IF) {
+        return 0;
+    }
+
+    // FERR belongs to the next unread character, so check it before RCREG1.
+    uint8_t framing_error = RCSTA1bits.FERR;
+    if (!UART_RECEIVE(input_buffer)) {
+        return 0;
+    }
+
+    if (framing_error) {
+        err_response->code = "$ERR, ";
+        err_response->message = "Framing Error";
+        transmit_response(err_response);
+        return 1;
+    }
+
+    // Ignore line endings added by the serial terminal.
+    if (input_buffer[0] == '\r' || input_buffer[0] == '\n') {
+        return 0;
+    }
+
+    if (input_buffer[0] != '\0' && (strchr(valid_input_u, input_buffer[0]) || strchr(valid_input_l, input_buffer[0]))) {
         err_response->code = "$ACK, ";
-        
+        err_response->message = "";
     } else {
         err_response->code = "$ERR, ";
-        
-        char response[20];        
-        strcat(response, "Invalid Input: ");
-        strncat(response, input_buffer, 1);
-        strcat(response, "\r\n");
-        
-        err_response->message = response;
+        err_response->message = "CMD";
         transmit_response(err_response);
     }
-    
-} 
+
+    return 1;
+}
