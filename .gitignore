@@ -1,5 +1,7 @@
 **/build/*
+.vscode/    
 My_Project/
 .clangd
 prog.sh
 build.sh
+
