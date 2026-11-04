@@ -39,7 +39,7 @@ static void configure_sys(void) {
   T2CONbits.T2OUTPS = 0;
   T2CONbits.T2CKPS = 0b10;
   TMR2 = 0;
-  PR2 = 249;
+  PR2 = 249; // 16 MHz / 4 / 16 / 250 = 1 kHz (one-ms system tick).
 
   INTCON2bits.INTEDG0 = 0;
   INTCON2bits.INTEDG1 = 0;

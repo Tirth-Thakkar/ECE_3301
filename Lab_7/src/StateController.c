@@ -9,6 +9,8 @@
 #define FAULT_LED LATDbits.LATD1
 #define HEARTBEAT_LED LATDbits.LATD2
 
+extern volatile uint8_t fault_event;
+
 static DroneState state = SAFE;
 static MotionState motion = STABLE;
 static uint8_t sensor_ready = 0;
@@ -39,11 +41,17 @@ static void change_state(DroneState next, uint32_t tick) {
 }
 
 static void update_outputs(void) {
+  uint8_t high_enabled = INTCONbits.GIEH;
+
   SAFE_LED = (state == SAFE);
   ARMING_LED = (state == ARMING);
-  ARMED_LED = (state == ARMED);
   FAULT_LED = (state == FAULT);
   HEARTBEAT_LED = heartbeat;
+
+  INTCONbits.GIEH = 0;
+  ARMED_LED = (state == ARMED && FAULT_INPUT != 0 && !fault_event &&
+               !INTCONbits.INT0IF);
+  INTCONbits.GIEH = high_enabled;
 }
 
 void fsm_init(uint8_t sensor_ok) {
@@ -57,7 +65,8 @@ void fsm_init(uint8_t sensor_ok) {
 void fsm_run(uint32_t tick, uint8_t fault, uint8_t arm, uint8_t comm) {
   uint16_t interval;
 
-  if (fault) {
+  // Also catch a fault held LOW before interrupts were enabled (no new edge).
+  if (fault || FAULT_INPUT == 0) {
     change_state(FAULT, tick);
   } else {
     if (arm) {

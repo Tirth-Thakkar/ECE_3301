@@ -10,7 +10,8 @@ void SPI_Init(void) {
   TRISDbits.TRISD0 = 0;
 
   SSP1CON1bits.SSPEN = 0;
-  SSP1STATbits.SMP = 1;
+  // LIS3DH mode 3: idle high, shift on falling edges, sample on rising edges.
+  SSP1STATbits.SMP = 0;
   SSP1STATbits.CKE = 0;
   SSP1CON1bits.CKP = 1;
   SSP1CON1bits.SSPM = 0b0010;

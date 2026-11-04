@@ -9,7 +9,7 @@ add_compile_options(${MCU_FLAGS})
 add_link_options(${MCU_FLAGS})
 
 add_library(LCD OBJECT
-    src/lcd.c
+    src/LCD.c
 )
 
 # Define the build target

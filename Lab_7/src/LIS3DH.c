@@ -25,7 +25,9 @@ uint8_t LIS3DH_Init(void) {
     return 0;
   }
 
+  // BDU=1, BLE=0, FS=00 (+/-2 g), HR=1, SIM=0
   LIS3DH_WriteRegister(LIS3DH_CTRL_REG4, 0x88);
+  // ODR=0101 (100 Hz), LPen=0, X/Y/Z enabled.
   LIS3DH_WriteRegister(LIS3DH_CTRL_REG1, 0x57);
 
   if (LIS3DH_ReadRegister(LIS3DH_CTRL_REG4) != 0x88) {

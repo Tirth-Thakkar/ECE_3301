@@ -19,7 +19,7 @@
  *     rise times of 0.1-10 ms, which USB power does not guarantee.
  */
 
-#include "../include/lcd.h"
+#include "../include/LCD.h"
 #include <stdint.h>
 #include <xc.h>
 
