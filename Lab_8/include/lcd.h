@@ -26,17 +26,17 @@
 
 #include <stdint.h>
 
-#define LCD_COLS  16u
-#define LCD_ROWS  2u
+#define LCD_COLS 16u
+#define LCD_ROWS 2u
 
 /* HD44780 instruction codes used by this driver */
-#define LCD_CMD_CLEAR         0x01u   /* clear display, cursor home (slow) */
-#define LCD_CMD_HOME          0x02u   /* cursor home (slow)                */
-#define LCD_CMD_ENTRY_INC     0x06u   /* increment address, no shift      */
-#define LCD_CMD_DISPLAY_OFF   0x08u
-#define LCD_CMD_DISPLAY_ON    0x0Cu   /* display on, cursor off, no blink  */
-#define LCD_CMD_FUNC_4BIT_2L  0x28u   /* 4-bit bus, 2 lines, 5x8 font      */
-#define LCD_CMD_SET_DDRAM     0x80u   /* OR with a DDRAM address           */
+#define LCD_CMD_CLEAR 0x01u     /* clear display, cursor home (slow) */
+#define LCD_CMD_HOME 0x02u      /* cursor home (slow)                */
+#define LCD_CMD_ENTRY_INC 0x06u /* increment address, no shift      */
+#define LCD_CMD_DISPLAY_OFF 0x08u
+#define LCD_CMD_DISPLAY_ON 0x0Cu   /* display on, cursor off, no blink  */
+#define LCD_CMD_FUNC_4BIT_2L 0x28u /* 4-bit bus, 2 lines, 5x8 font      */
+#define LCD_CMD_SET_DDRAM 0x80u    /* OR with a DDRAM address           */
 
 /* Initialize PORTD pins RD2..RD7 and the LCD. Call once at startup. */
 void LCD_Init(void);

@@ -1,14 +1,28 @@
-cmake_minimum_required(VERSION 3.21)
-project(Lab_8 LANGUAGES C ASM)
+cmake_minimum_required(VERSION 3.21.1)
+set(CMAKE_SYSTEM_NAME "Generic")
 
-# Invoke with -DCMAKE_TOOLCHAIN_FILE=cmake/PIC18F46K22.cmake
-# PIC18F46K22, 16 MHz INTOSC; the macro MUST reach both main.c and lcd.c.
-add_executable(Lab8_app
-    src/main.c
+project(Lab_5 LANGUAGES C ASM)
+set(CMAKE_EXECUTABLE_SUFFIX ".elf")
+
+set(MCU_FLAGS "-mcpu=${MCU}")
+add_compile_options(${MCU_FLAGS})
+add_link_options(${MCU_FLAGS})
+
+add_library(LCD OBJECT
     src/lcd.c
 )
-target_include_directories(Lab8_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_compile_definitions(Lab8_app PRIVATE _XTAL_FREQ=16000000UL)
-# The selected XC8 C99 mode uses IEEE 754 32-bit float and double.
-# Verify the XC8 project properties (float/double = 32 bits) before programming.
-set_target_properties(Lab8_app PROPERTIES SUFFIX ".elf")
+
+# Define the build target
+add_executable(Lab8_app 
+    src/main.c
+)
+
+target_include_directories(Lab8_app 
+    PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_sources(Lab8_app
+    PRIVATE
+    $<TARGET_OBJECTS:LCD>
+)
