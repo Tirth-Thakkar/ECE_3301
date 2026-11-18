@@ -6,9 +6,9 @@
 typedef enum { FLIGHT_VIEW, ENGINEER_VIEW } ViewState;
 
 typedef struct {
-  ViewState current_state;
-  uint8_t averaging;
-  ADCBlock adc;
+    ViewState current_state;
+    uint8_t averaging;
+    ADCBlock adc;
 } StateController;
 
 void fsm_init(void);

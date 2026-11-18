@@ -21,7 +21,6 @@ typedef struct {
     uint32_t last_sample_ms;
 } StateController;
 
-/* Inspect the latest consecutive capture in the debugger. */
 extern uint16_t experiment_samples[16];
 
 void fsm_init(void);

@@ -8,7 +8,6 @@
 #define MOTION_WINDOW 5u
 #define MOTION_CONFIRMATIONS 2
 
-/* Lab 8's calibration, filtering, and motion thresholds. */
 #define CALIBRATION_SPREAD_PA 5.0f
 #define FILTER_ALPHA 0.8f
 #define ALTITUDE_SCALE_M 44330.0f
@@ -112,7 +111,6 @@ static void update_altitude(void) {
 void Altimeter_Init(uint32_t tick) { start_sensor(tick); }
 
 void Altimeter_Sample(uint32_t tick) {
-    /* Keep the Lab 8 sensor states explicit, as in the earlier controllers. */
     switch (flight.status) {
     case SENSOR_FAULT:
         if ((uint32_t)(tick - retry_started_ms) >= SENSOR_RETRY_MS) {

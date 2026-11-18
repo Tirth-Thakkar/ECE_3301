@@ -69,7 +69,7 @@ int BMP280_Init(void) {
         return 0;
     }
 
-    /* Set config while asleep, then enable T x2 / P x16 in normal mode. */
+    // Set config while asleep, then enable T x2 / P x16 in normal mode. 
     initialized = I2C_WriteRegister(BMP280_ADDRESS, BMP280_CONFIG_REG,
                                     BMP280_CONFIG_VALUE) &&
                   I2C_WriteRegister(BMP280_ADDRESS, BMP280_CTRL_MEAS_REG,

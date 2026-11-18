@@ -17,7 +17,7 @@ void ADC_Init(void) {
     ADCON0 = 0u;
     ANSELAbits.ANSA0 = 1u;
     TRISAbits.TRISA0 = 1u;
-    ADCON1 = 0u; /* PVCFG = 00 (VDD), NVCFG = 00 (VSS). */
+    ADCON1 = 0u; // PVCFG = 00 (VDD), NVCFG = 00 (VSS).
     ADCON2 = (uint8_t)(0x80u | ADC_ACQT_4 | ADC_CLOCK_NORMAL);
     PIR1bits.ADIF = 0u;
     block_sum = 0u;
@@ -29,11 +29,11 @@ void ADC_Init(void) {
     published_value = 0u;
     published_pp = 0u;
     data_ready = 0u;
-    ADCON0bits.ADON = 1u; /* Channel defaults to AN0; start separately. */
+    ADCON0bits.ADON = 1u; // Channel defaults to AN0; start separately.
 }
 
 void ADC_Start(void) {
-    /* ADIF also guards a finished result that has not been collected yet. */
+    // ADIF also guards a finished result that has not been collected yet.
     if (!ADCON0bits.GO_nDONE && !PIR1bits.ADIF) {
         ADCON0bits.GO_nDONE = 1u;
     }
@@ -57,7 +57,7 @@ void ADC_Interrupt(void) {
                               : value;
         published_pp = (uint16_t)(block_max - block_min);
         ++adc_completed_blocks;
-        data_ready = 1u; /* Publish last, after both 16-bit values are ready. */
+        data_ready = 1u; // Publish last, after both 16-bit values are ready.
         block_sum = 0u;
         block_min = ADC_MAX_COUNT;
         block_max = 0u;

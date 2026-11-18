@@ -33,7 +33,7 @@ static const char *experiment_name(void) {
 }
 
 void fsm_select_experiment(ExperimentState experiment, uint32_t tick) {
-    /* Each case states the channel, clock, and acquisition time explicitly. */
+    // Set channel, clock, and acquisition time
     switch (experiment) {
     case EXPERIMENT_A_NORMAL:
         ADC_Configure(ADC_AN0, ADC_CLOCK_NORMAL, ADC_ACQUIRE_4_TAD);
@@ -62,7 +62,7 @@ void fsm_select_experiment(ExperimentState experiment, uint32_t tick) {
 
     fsm_t.current_state = experiment;
     fsm_t.adc_value = 0u;
-    /* Always allow a full reference interval after changing the channel. */
+    // Full reference interval after changing channel
     fsm_t.last_sample_ms = tick;
     Dashboard_Update(fsm_t.adc_value, experiment_name());
 }

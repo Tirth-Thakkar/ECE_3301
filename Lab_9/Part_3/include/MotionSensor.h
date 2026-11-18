@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 typedef struct {
-  uint8_t ready;
-  int16_t ax;
-  int16_t ay;
-  int16_t az;
+    uint8_t ready;
+    int16_t ax;
+    int16_t ay;
+    int16_t az;
 } MotionData;
 
 void MotionSensor_Init(uint32_t tick);

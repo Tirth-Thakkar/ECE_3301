@@ -17,7 +17,7 @@ void main(void) {
 }
 
 void __interrupt() isr(void) {
-    /* Collect an old result before the timer can start another conversion. */
+    // Collect prior result before starting new conversion
     if (PIE1bits.ADIE && PIR1bits.ADIF) {
         ADC_Interrupt();
     }

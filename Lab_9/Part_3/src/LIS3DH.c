@@ -32,7 +32,6 @@ uint8_t LIS3DH_I2C_Init(void) {
     return 1u;
 }
 
-/* Same signed 12-bit, +/-2 g decoding as Lab 7: one count is 1 mg. */
 static int16_t LIS3DH_Decode(uint8_t low, uint8_t high) {
     uint16_t raw = ((uint16_t)high << 8) | low;
     int16_t value = (int16_t)(raw >> 4);

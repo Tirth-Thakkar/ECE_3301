@@ -9,8 +9,8 @@
 #define ADC_ACQT_4 0x10u
 
 typedef struct {
-  uint16_t value;
-  uint16_t peak_to_peak;
+    uint16_t value;
+    uint16_t peak_to_peak;
 } ADCBlock;
 
 extern volatile uint32_t adc_completed_blocks;
