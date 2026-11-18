@@ -195,7 +195,7 @@ IndentExternBlock: AfterExternBlock
 IndentGotoLabels: OuterIndent
 IndentPPDirectives: None
 IndentRequiresClause: true
-IndentWidth:     2
+IndentWidth:     4
 IndentWrappedFunctionNames: false
 InsertBraces:    false
 InsertNewlineAtEOF: false

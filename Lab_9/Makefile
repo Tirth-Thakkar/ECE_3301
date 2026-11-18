@@ -18,7 +18,7 @@ test:
 	$(CC) -std=c99 -Wall -Wextra -Werror -Itests tests/test_monitor.c \
 		Part_3/src/ADC.c Part_3/src/System.c Part_3/src/Dashboard.c \
 		Part_3/src/Altimeter.c Part_3/src/MotionSensor.c Part_3/src/LIS3DH.c \
-		Common/src/Button.c Common/src/Indicators.c -lm -o build/tests/test_monitor
+		lib/src/Button.c lib/src/Indicators.c -lm -o build/tests/test_monitor
 	./build/tests/test_monitor
 	$(CC) -std=c99 -Wall -Wextra -Werror tests/test_part1.c Part_1/src/StateController.c -o build/tests/test_part1
 	./build/tests/test_part1

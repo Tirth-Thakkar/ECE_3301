@@ -17,9 +17,9 @@ add_library(System OBJECT src/System.c)
 add_library(Altimeter OBJECT src/Altimeter.c)
 add_library(MotionSensor OBJECT src/MotionSensor.c)
 add_library(LIS3DH OBJECT src/LIS3DH.c)
-add_library(Button OBJECT ../Common/src/Button.c)
-add_library(Indicators OBJECT ../Common/src/Indicators.c)
-add_library(LCD OBJECT ../Common/src/LCD.c)
+add_library(Button OBJECT ../lib/src/Button.c)
+add_library(Indicators OBJECT ../lib/src/Indicators.c)
+add_library(LCD OBJECT ../lib/src/LCD.c)
 
 # Keep the working Lab 8 bus and pressure-sensor drivers.
 add_library(BMP280 OBJECT ../../Lab_8/src/BMP280.c)

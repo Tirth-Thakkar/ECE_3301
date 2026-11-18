@@ -13,5 +13,6 @@ typedef struct {
 
 void fsm_init(void);
 void fsm_run(uint32_t tick);
+void Dashboard_Update(uint16_t value);
 
 #endif
