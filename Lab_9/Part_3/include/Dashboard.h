@@ -1,5 +1,5 @@
-#ifndef LAB9_DASHBOARD_H
-#define LAB9_DASHBOARD_H
+#ifndef DASHBOARD_H
+#define DASHBOARD_H
 
 #include "ADC.h"
 #include "Altimeter.h"
@@ -10,4 +10,4 @@ void Dashboard_Flight(const FlightData *flight, const MotionData *motion,
 void Dashboard_Engineer(const ADCBlock *block, uint8_t averaging);
 void Dashboard_Motion(const MotionData *motion);
 
-#endif
+#endif // DASHBOARD_H

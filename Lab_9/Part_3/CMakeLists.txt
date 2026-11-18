@@ -9,23 +9,64 @@ add_compile_options(${MCU_FLAGS})
 add_link_options(${MCU_FLAGS})
 add_compile_definitions(_XTAL_FREQ=16000000UL)
 
-# Every source in this project has one purpose; no section-selection flags.
-add_library(ADC OBJECT src/ADC.c)
-add_library(Dashboard OBJECT src/Dashboard.c)
-add_library(StateController OBJECT src/StateController.c)
-add_library(System OBJECT src/System.c)
-add_library(Altimeter OBJECT src/Altimeter.c)
-add_library(MotionSensor OBJECT src/MotionSensor.c)
-add_library(LIS3DH OBJECT src/LIS3DH.c)
-add_library(Button OBJECT ../lib/src/Button.c)
-add_library(Indicators OBJECT ../lib/src/Indicators.c)
-add_library(LCD OBJECT ../lib/src/LCD.c)
+add_library(ADC OBJECT
+    src/ADC.c
+)
 
-# Keep the working Lab 8 bus and pressure-sensor drivers.
-add_library(BMP280 OBJECT ../../Lab_8/src/BMP280.c)
-add_library(I2C OBJECT ../../Lab_8/src/I2C.c)
+add_library(Altimeter OBJECT
+    src/Altimeter.c
+)
 
-add_executable(Lab9_Part3_app src/main.c)
+add_library(BMP280 OBJECT
+    src/BMP280.c
+)
+
+add_library(Dashboard OBJECT
+    src/Dashboard.c
+)
+
+add_library(I2C OBJECT
+    src/I2C.c
+)
+
+add_library(LIS3DH OBJECT
+    src/LIS3DH.c
+)
+
+add_library(MotionSensor OBJECT
+    src/MotionSensor.c
+)
+
+add_library(StateController OBJECT
+    src/StateController.c
+)
+
+add_library(System OBJECT
+    src/System.c
+)
+
+add_library(Button OBJECT
+    ../lib/src/Button.c
+)
+
+add_library(Indicators OBJECT
+    ../lib/src/Indicators.c
+)
+
+add_library(LCD OBJECT
+    ../lib/src/LCD.c
+)
+
+add_executable(Lab9_Part3_app
+    src/main.c
+)
+
+target_include_directories(Lab9_Part3_app
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lib/include
+)
+
 target_sources(Lab9_Part3_app PRIVATE
     $<TARGET_OBJECTS:ADC>
     $<TARGET_OBJECTS:Dashboard>

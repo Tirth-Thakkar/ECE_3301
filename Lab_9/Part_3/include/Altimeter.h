@@ -1,8 +1,21 @@
 #ifndef ALTIMETER_H
 #define ALTIMETER_H
 
-/* Retain Lab 8's sensor status, vertical states, and flight-data format. */
-#include "../../../Lab_8/include/Dashboard.h"
+#include <stdint.h>
+
+#define CALIBRATION_SAMPLES 32u
+
+typedef enum { CALIBRATING, RUNNING, SENSOR_FAULT } SensorStatus;
+typedef enum { GROUND, CLIMB, HOLD, DESCEND } VerticalState;
+
+typedef struct {
+    SensorStatus status;
+    VerticalState vertical_state;
+    float pressure_pa;
+    float temperature_c;
+    float altitude_m;
+    uint8_t calibration_count;
+} FlightData;
 
 void Altimeter_Init(uint32_t tick);
 void Altimeter_Sample(uint32_t tick);

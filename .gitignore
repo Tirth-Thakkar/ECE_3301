@@ -4,4 +4,5 @@ My_Project/
 .clangd
 prog.sh
 build.sh
-
+*/tests/*
+misc/
