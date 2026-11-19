@@ -29,8 +29,8 @@ add_library(I2C OBJECT
     src/I2C.c
 )
 
-add_library(LIS3DH OBJECT
-    src/LIS3DH.c
+add_library(ICM20948 OBJECT
+    src/ICM20948.c
 )
 
 add_library(MotionSensor OBJECT
@@ -74,7 +74,7 @@ target_sources(Lab9_Part3_app PRIVATE
     $<TARGET_OBJECTS:System>
     $<TARGET_OBJECTS:Altimeter>
     $<TARGET_OBJECTS:MotionSensor>
-    $<TARGET_OBJECTS:LIS3DH>
+    $<TARGET_OBJECTS:ICM20948>
     $<TARGET_OBJECTS:BMP280>
     $<TARGET_OBJECTS:I2C>
     $<TARGET_OBJECTS:Button>

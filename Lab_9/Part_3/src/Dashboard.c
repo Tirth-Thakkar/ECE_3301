@@ -134,7 +134,7 @@ void Dashboard_Motion(const MotionData *motion) {
     char bottom[2u * LCD_COLS + 1u];
 
     if (!motion->ready) {
-        LCD_PrintLine(0u, "LIS3DH FAULT");
+        LCD_PrintLine(0u, "ICM20948 FAULT");
         LCD_PrintLine(1u, "CHECK I2C / CS");
         return;
     }
